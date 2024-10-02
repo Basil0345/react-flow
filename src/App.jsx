@@ -1,5 +1,5 @@
 import "./App.css";
-import { useCallback } from "react";
+import { useCallback, useEffect } from "react";
 import ReactFlow, {
   MiniMap,
   Controls,
@@ -21,9 +21,31 @@ function App() {
   const [nodes, setNodes, onNodesChange] = useNodesState(initialNodes);
   const [edges, setEdges, onEdgesChange] = useEdgesState(initialEdges);
 
+  useEffect(() => {
+    setNodes(nodes.filter((node) => node.position.x === 0));
+  }, []);
+
+  const handleNodeClick = (event, node) => {
+    let childs = node.data.children;
+    if (childs.length) {
+      childs.map((item) => {
+        setNodes((prev) => [
+          ...prev,
+          ...initialNodes.filter((eq) => eq.id === item),
+        ]);
+      });
+    }
+  };
+
   return (
     <div style={{ height: 500 }}>
-      <ReactFlow nodes={nodes} edges={edges} nodeTypes={nodeType} fitView>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        nodeTypes={nodeType}
+        onNodeClick={handleNodeClick}
+        fitView
+      >
         {/* <MiniMap /> */}
         <Controls />
         <Background />
